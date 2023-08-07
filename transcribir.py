@@ -68,3 +68,4 @@ for audio_file in audio_files:
     text_path = transcriptions_dir + text_file
     with open(text_path, "w", encoding="utf-8") as f:
         f.write(text)
+# %%
