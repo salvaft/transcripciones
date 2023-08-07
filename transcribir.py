@@ -43,7 +43,7 @@ for video_file in video_files:
         continue
 
     # Extract the audio from the video file using librosa
-    audio_path = audios_dir + (video_file.stem + (".wav"))
+    audio_path = audios_dir / (video_file.stem + (".wav"))
 
     y, sr = librosa.load(
         video_file, sr=16000
@@ -69,7 +69,7 @@ for audio_file in audio_files:
 
     # Save the transcription as a text file
     text_file = audio_file.stem + ".txt"  # Replace the video extension with .txt
-    text_path = transcriptions_dir + text_file
+    text_path = transcriptions_dir / text_file
     with open(text_path, "w", encoding="utf-8") as f:
         f.write(text)
 # %%
