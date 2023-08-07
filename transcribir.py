@@ -24,6 +24,10 @@ transcriptions_dir = pathlib.Path("./transcriptions/")
 ############ EXTENSIONES VIDEOS ############
 video_extensions = ["*.mkv", "*.mp4"]
 ############ EXTENSIONES VIDEOS ############
+#
+############ EXTENSIONES AUDIOS ############
+audio_extensions = ["*.wav", "*.opus"]
+############ EXTENSIONES AUDIOS ############
 # %%
 video_files = []
 for extension in video_extensions:
@@ -58,7 +62,7 @@ for audio_file in audio_files:
         print(f"Skiping {audio_file}")
         continue
     print("Doing " + audio_file.stem)
-    result = model.transcribe(audio_file, language="spanish")
+    result = model.transcribe(str(audio_file), language="spanish")
 
     text = result["text"].strip()
     text = text.replace(". ", ".\n")
