@@ -4,7 +4,7 @@ import librosa
 import soundfile as sf
 from consts import paths
 
-model = whisper.load_model("small")  # load the small model
+MODEL = whisper.load_model("small")  # load the small model
 
 #
 ############ EXTENSIONES VIDEOS ############
@@ -36,10 +36,12 @@ for video_file in video_files:
         continue
 
     # Extract the audio from the video file using librosa
+    print("Doing " + video_file.stem)
 
     y, sr = librosa.load(
         video_file, sr=16000
     )  # Load the audio with 16 kHz sampling rate
+
     audio_path = paths.audios_dir / (video_file.stem + (".wav"))
     sf.write(audio_path, y, sr)  # Save the audio as a wav file
     print("Wrote " + audio_path)
@@ -55,7 +57,7 @@ for audio_file in audio_files:
         print(f"Skiping {audio_file}")
         continue
     print("Doing " + audio_file.stem)
-    result = model.transcribe(str(audio_file), language="spanish")
+    result = MODEL.transcribe(str(audio_file), language="spanish")
 
     text = result["text"].strip()
     text = text.replace(". ", ".\n")
