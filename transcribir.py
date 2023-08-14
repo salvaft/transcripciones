@@ -1,3 +1,40 @@
+"""
+This module processes video files, extracts audio, transcribes the audio using 
+the Whisper speech-to-text model, and saves the transcriptions as text files.
+
+Module Dependencies:
+    - whisper
+    - librosa
+    - soundfile (as sf)
+    - consts (importing paths)
+
+Global Constants:
+    - MODEL: The Whisper model used for transcription, loaded with the "small" configuration.
+
+Functions and Processes:
+1. Preprocessing:
+    - Create necessary folders for videos, audios, and transcriptions if they do not exist.
+
+2. Extracting Audio:
+    - Extract audio from video files with a 16 kHz sampling rate using librosa.
+    - Save the extracted audio as WAV files in the audios folder.
+
+3. Transcribing Audio:
+    - Use the Whisper model to transcribe audio files.
+    - Save transcriptions as text files in the transcriptions folder.
+    - The Whisper model is specifically configured for Spanish language transcription.
+
+Notes:
+    - The module processes video files with the following extensions: *.mkv and *.mp4.
+    - Extracted audio is saved as WAV files.
+    - Transcribed text is saved as UTF-8 encoded text files.
+
+Example Usage:
+    - Import the necessary modules and constants.
+    - Configure the paths for videos, audios, and transcriptions in consts.paths.
+    - Run the module to process video files, extract audio, and transcribe the audio.
+"""
+
 # %%
 import whisper
 import librosa
