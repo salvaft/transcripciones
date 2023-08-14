@@ -3,3 +3,8 @@ audios/*
 transcriptions/*
 .python-version
 __pycache__
+profe
+*.zip
+_quick*
+*.pkl
+temp
