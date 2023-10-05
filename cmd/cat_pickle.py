@@ -30,6 +30,9 @@ CWD = Path(".")
 
 PROJECT = CWD.parent
 
-with open(PROJECT / "pickle.pkl", "rb") as pkl:
+with open(PROJECT / "pickle.pkl", "rb+") as pkl:
     data = pickle.load(pkl)
+    pkl.seek(0)
+    data["temas"] = [item for item in data["temas"] if item["files"]]
+    # pickle.dump(data, pkl)
     pprint.pprint(data)
