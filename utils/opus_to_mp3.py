@@ -40,5 +40,5 @@ def convert_opus_to_mp3(opus_file):
     Example:
         convert_opus_to_mp3("input.opus", "output.mp3")"""
     sound = AudioSegment.from_file(opus_file, format="ogg")
-    mp3_file = opus_file.with_suffix(".mp3")
-    sound.export(mp3_file, format="mp3")
+    wav_file = opus_file.with_suffix(".wav")
+    sound.export(wav_file, format="wav")
