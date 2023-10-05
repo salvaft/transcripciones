@@ -39,7 +39,6 @@ import re
 import sys
 import pickle
 from utils.opus_to_mp3 import convert_opus_to_mp3
-from utils.delete_dir import delete_directory
 
 
 ZIP_SOURCE_DIR = Path("/home/sft/Nextcloud/")
@@ -48,8 +47,8 @@ PROFE_SORTED_DIR = PROFE_DIR / "sorted"
 DUMP_DIR = PROFE_DIR / ".dump"
 CHAT_FILE = DUMP_DIR / "_chat.txt"
 
-if os.path.exists(DUMP_DIR):
-    delete_directory(DUMP_DIR)
+# if os.path.exists(DUMP_DIR):
+#     delete_directory(DUMP_DIR)
 
 # Iterate through all files in the source directory with the specified file extension
 for file_path in ZIP_SOURCE_DIR.glob("*profe.zip"):
@@ -100,9 +99,8 @@ for index, line in enumerate(lines[LAST_LINE:]):
             tema["title"] = message.replace("/", "_")
             tema["files"] = []
             temas.append(tema)
-
-        if char and "omitted" not in message:
         # Appending files to a tema entry
+        if char and "omitted" not in message and "attached" in message:
             rematch = re.match(FILENAME_PATTERN, message.strip())
             if rematch:
                 filename = rematch.groups()[0]
@@ -137,7 +135,7 @@ for tema in temas:
         sorted_file_path = PROFE_SORTED_DIR / tema["title"] / file.name
         if sorted_file_path.suffix in [".ogg", ".opus"]:
             sorted_file_path = (
-                PROFE_SORTED_DIR / tema["title"] / file.with_suffix(".mp3").name
+                PROFE_SORTED_DIR / tema["title"] / file.with_suffix(".wav").name
             )
         # If the converted file does not exist moves the original file
         if not sorted_file_path.exists():
@@ -158,7 +156,3 @@ matching_files = list(PROFE_SORTED_DIR.rglob(OPUS_EXTENSION)) + list(
 for file in matching_files:
     convert_opus_to_mp3(file)
     file.unlink()
-
-# Zip the sorted directory
-shutil.make_archive("audios_profe", "zip", PROFE_SORTED_DIR)
-print(f"Folder '{PROFE_SORTED_DIR}' zipped to audios_profe.zip successfully.")
