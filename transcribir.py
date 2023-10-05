@@ -41,6 +41,7 @@ import librosa
 import soundfile as sf
 from consts import paths
 
+
 MODEL = whisper.load_model("small")  # load the small model
 
 #
@@ -86,22 +87,26 @@ for video_file in video_files:
 
 # %%
 # Transcribe the audio file using Whisper
-audio_files = paths.audios_dir.glob("**/*")
+audio_files = paths.audios_dir.glob("**/*.*")
 transcribed_files = [file.stem for file in paths.transcriptions_dir.iterdir()]
 for audio_file in audio_files:
-    print(audio_file)
     if audio_file.stem in transcribed_files:
         print(f"Skiping {audio_file}")
         continue
-    print("Doing " + audio_file.stem)
+    print("Doing " + str(audio_file))
     result = MODEL.transcribe(str(audio_file), language="spanish")
 
     text = result["text"].strip()
     text = text.replace(". ", ".\n")
 
-    # Save the transcription as a text file
-    text_file = audio_file.stem + ".txt"  # Replace the video extension with .txt
-    text_path = paths.transcriptions_dir / text_file
-    with open(text_path, "w", encoding="utf-8") as f:
+    text_file_path = (
+        paths.transcriptions_dir
+        / audio_file.relative_to(paths.audios_dir)
+        / (audio_file.stem + ".txt")
+    )
+
+    # Ensure that the parent directory exists; create it if it doesn't
+    text_file_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(text_file_path, "w", encoding="utf-8") as f:
         f.write(text)
 # %%
