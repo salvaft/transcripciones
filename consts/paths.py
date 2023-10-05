@@ -25,3 +25,7 @@ audios_dir = pathlib.Path("./audios/")
 ############ DIRECTORIO TRANSCRIPCIONES ############
 transcriptions_dir = pathlib.Path("./transcriptions/")
 ############ DIRECTORIO TRANSCRIPCIONES ############
+#
+############ DIRECTORIO TRANSCRIPCIONES ############
+cwd = pathlib.Path(".")
+############ DIRECTORIO TRANSCRIPCIONES ############
