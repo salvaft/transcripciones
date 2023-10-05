@@ -94,13 +94,15 @@ for index, line in enumerate(lines[LAST_LINE:]):
     if match:
         tema = {}
 
+        # Creating a new tema entry
         char, date, time, sender, message = match.groups()
-        if "omitted" not in message and not char:
+        if "omitted" not in message and "deleted" not in message and not char:
             tema["title"] = message.replace("/", "_")
             tema["files"] = []
             temas.append(tema)
 
         if char and "omitted" not in message:
+        # Appending files to a tema entry
             rematch = re.match(FILENAME_PATTERN, message.strip())
             if rematch:
                 filename = rematch.groups()[0]
@@ -109,20 +111,35 @@ for index, line in enumerate(lines[LAST_LINE:]):
 
 LAST_LINE = len(lines)
 
+
+# Clean entries with empty file list
+temas = [item for item in temas if item["files"]]
+
 with open("pickle.pkl", "wb") as pkl_file:
     data_to_save = {"last_line": LAST_LINE, "temas": temas}
+    # Example data saved
+    """
+    {'files': [PosixPath('profe/.dump/00000135-AUDIO-2023-10-04-17-00-22.opus'),
+                        PosixPath('profe/.dump/00000136-AUDIO-2023-10-04-17-00-23.opus')],
+    'title': 'Normativa PSX'}]}
+    """
     pickle.dump(data_to_save, pkl_file)
 
 for tema in temas:
+    # If the folder title does not exist and the file list is not empty create the target folder
     if not os.path.exists(PROFE_SORTED_DIR / tema["title"]) and tema["files"]:
         os.makedirs(PROFE_SORTED_DIR / tema["title"])
+    """
+    For each of the files checks if the converted file exist
+    If the file does not exist is moved to the folder
+    """
     for file in tema["files"]:
         sorted_file_path = PROFE_SORTED_DIR / tema["title"] / file.name
         if sorted_file_path.suffix in [".ogg", ".opus"]:
             sorted_file_path = (
                 PROFE_SORTED_DIR / tema["title"] / file.with_suffix(".mp3").name
             )
-
+        # If the converted file does not exist moves the original file
         if not sorted_file_path.exists():
             shutil.move(file, PROFE_SORTED_DIR / tema["title"])
         else:
@@ -131,10 +148,13 @@ for tema in temas:
 
 OPUS_EXTENSION = "*.opus"
 OGG_EXTENSION = "*.ogg"
+# Creates a list of all opus and ogg files in the sorted dir. Meaning if they
+# are there they should be converted
 matching_files = list(PROFE_SORTED_DIR.rglob(OPUS_EXTENSION)) + list(
     PROFE_SORTED_DIR.rglob(OGG_EXTENSION)
 )
 
+# Converts and deletes the old file
 for file in matching_files:
     convert_opus_to_mp3(file)
     file.unlink()
