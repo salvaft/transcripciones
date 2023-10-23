@@ -39,6 +39,7 @@ import re
 import sys
 import pickle
 from utils.opus_to_mp3 import convert_opus_to_mp3
+from colorama import Fore, Style
 
 
 ZIP_SOURCE_DIR = Path("/home/sft/Nextcloud/")
@@ -65,6 +66,7 @@ for zip_file in PROFE_DIR.glob("*profe.zip"):
 
 # Read the file into a list of lines
 if not CHAT_FILE.exists():
+    print(f"{Fore.RED}File {CHAT_FILE} does not exist{Style.RESET_ALL}")
     sys.exit()
 
 with open(CHAT_FILE, "r", encoding="UTF-8") as file:
@@ -100,6 +102,7 @@ for index, line in enumerate(lines[LAST_LINE:]):
             tema["title"] = message.replace("/", "_")
             tema["files"] = []
             temas.append(tema)
+            print(f"{Fore.LIGHTYELLOW_EX}Appending {tema['title']}{Style.RESET_ALL}")
         # Appends the files attached after a given message to a tema entry being the title the forementioned message
         if char and "omitted" not in message and "attached" in message:
             rematch = re.match(FILENAME_PATTERN, message.strip())
@@ -139,9 +142,10 @@ for tema in temas:
             )
         # If the converted file does not exist moves the original file
         if not sorted_file_path.exists():
+            print(
+                f"{Fore.LIGHTYELLOW_EX}Adding {file} to {PROFE_SORTED_DIR / tema['title']} {Style.RESET_ALL}"
+            )
             shutil.move(file, PROFE_SORTED_DIR / tema["title"])
-        else:
-            print(f"Skipping {file}")
 
 
 OPUS_EXTENSION = "*.opus"
@@ -155,4 +159,5 @@ matching_files = list(PROFE_SORTED_DIR.rglob(OPUS_EXTENSION)) + list(
 # Converts and deletes the old file
 for file in matching_files:
     convert_opus_to_mp3(file)
+    print(f"{Fore.GREEN}Converted {file}{Style.RESET_ALL}")
     file.unlink()
