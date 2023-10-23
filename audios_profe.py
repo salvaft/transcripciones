@@ -89,17 +89,18 @@ else:
 
 # Starting line is 23
 for index, line in enumerate(lines[LAST_LINE:]):
+    # Checks the regex for a message
     match = re.match(PATTERN, line)
     if match:
         tema = {}
 
-        # Creating a new tema entry
+        # If there is a match of the message it creates a new tema entry with the message. This will create new temas for messages that not precede a file. These will be cleaned after.
         char, date, time, sender, message = match.groups()
         if "omitted" not in message and "deleted" not in message and not char:
             tema["title"] = message.replace("/", "_")
             tema["files"] = []
             temas.append(tema)
-        # Appending files to a tema entry
+        # Appends the files attached after a given message to a tema entry being the title the forementioned message
         if char and "omitted" not in message and "attached" in message:
             rematch = re.match(FILENAME_PATTERN, message.strip())
             if rematch:
@@ -127,10 +128,9 @@ for tema in temas:
     # If the folder title does not exist and the file list is not empty create the target folder
     if not os.path.exists(PROFE_SORTED_DIR / tema["title"]) and tema["files"]:
         os.makedirs(PROFE_SORTED_DIR / tema["title"])
-    """
-    For each of the files checks if the converted file exist
-    If the file does not exist is moved to the folder
-    """
+
+    # For each of the files checks if the converted file exist
+    # If the file does not exist is moved to the folder
     for file in tema["files"]:
         sorted_file_path = PROFE_SORTED_DIR / tema["title"] / file.name
         if sorted_file_path.suffix in [".ogg", ".opus"]:
