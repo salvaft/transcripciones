@@ -52,6 +52,9 @@ CHAT_FILE = DUMP_DIR / "_chat.txt"
 #     delete_directory(DUMP_DIR)
 
 # Iterate through all files in the source directory with the specified file extension
+if not list(ZIP_SOURCE_DIR.glob("*profe.zip")):
+    print(f"{Fore.RED}No files found in {ZIP_SOURCE_DIR}{Style.RESET_ALL}")
+    sys.exit()
 for file_path in ZIP_SOURCE_DIR.glob("*profe.zip"):
     print(f"Moving file '{file_path}' to '{PROFE_DIR / file_path.name}'...")
     if not os.path.exists(PROFE_DIR):
@@ -103,6 +106,7 @@ for index, line in enumerate(lines[LAST_LINE:]):
             tema["files"] = []
             temas.append(tema)
             print(f"{Fore.LIGHTYELLOW_EX}Appending {tema['title']}{Style.RESET_ALL}")
+
         # Appends the files attached after a given message to a tema entry being the title the forementioned message
         if char and "omitted" not in message and "attached" in message:
             rematch = re.match(FILENAME_PATTERN, message.strip())
