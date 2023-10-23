@@ -40,6 +40,10 @@ import whisper
 import librosa
 import soundfile as sf
 from consts import paths
+import warnings
+
+# Ignore all warnings
+warnings.filterwarnings("ignore")
 
 
 MODEL = whisper.load_model("small")  # load the small model
