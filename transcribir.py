@@ -70,10 +70,12 @@ for extension in video_extensions:
 
 print(video_files)
 # %%
-audio_files = [file.stem for file in paths.audios_dir.iterdir()]
+audio_files = paths.audios_dir.glob("**/*.*")
+list_of_extracted = [file.relative_to(paths.audios_dir) for file in audio_files]
 # Loop through the video files and transcribe them
 for video_file in video_files:
-    if video_file.stem in audio_files:
+    extracted = video_file.relative_to(paths.videos_dir).with_suffix(".wav")
+    if extracted in list_of_extracted:
         print(f"Skipping {video_file}")
         continue
 
@@ -84,7 +86,8 @@ for video_file in video_files:
         video_file, sr=16000
     )  # Load the audio with 16 kHz sampling rate
 
-    audio_path = paths.audios_dir / (video_file.stem + (".wav"))
+    audio_path = paths.audios_dir / extracted
+    audio_path.parent.mkdir(parents=True, exist_ok=True)
     sf.write(audio_path, y, sr)  # Save the audio as a wav file
     print("Wrote " + audio_path)
 
@@ -92,25 +95,26 @@ for video_file in video_files:
 # %%
 # Transcribe the audio file using Whisper
 audio_files = paths.audios_dir.glob("**/*.*")
-transcribed_files = [file.stem for file in paths.transcriptions_dir.iterdir()]
+transcribed_files = paths.transcriptions_dir.glob("**/*.*")
+list_of_transcribed = [
+    file.relative_to(paths.transcriptions_dir) for file in transcribed_files
+]
+print(list_of_transcribed)
 for audio_file in audio_files:
-    if audio_file.stem in transcribed_files:
+    converted = audio_file.relative_to(paths.audios_dir).with_suffix(".txt")
+    if converted in list_of_transcribed:
         print(f"Skiping {audio_file}")
         continue
     print("Doing " + str(audio_file))
     result = MODEL.transcribe(str(audio_file), language="spanish")
-
     text = result["text"].strip()
     text = text.replace(". ", ".\n")
 
-    text_file_path = (
-        paths.transcriptions_dir
-        / audio_file.relative_to(paths.audios_dir)
-        / (audio_file.stem + ".txt")
-    )
+    text_file_path = paths.transcriptions_dir / converted
 
     # Ensure that the parent directory exists; create it if it doesn't
     text_file_path.parent.mkdir(parents=True, exist_ok=True)
     with open(text_file_path, "w", encoding="utf-8") as f:
         f.write(text)
+
 # %%
