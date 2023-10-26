@@ -68,7 +68,6 @@ video_files = []
 for extension in video_extensions:
     video_files = video_files + list(paths.videos_dir.glob("**/" + extension))
 
-print(video_files)
 # %%
 audio_files = paths.audios_dir.glob("**/*.*")
 list_of_extracted = [file.relative_to(paths.audios_dir) for file in audio_files]
@@ -99,11 +98,9 @@ transcribed_files = paths.transcriptions_dir.glob("**/*.*")
 list_of_transcribed = [
     file.relative_to(paths.transcriptions_dir) for file in transcribed_files
 ]
-print(list_of_transcribed)
 for audio_file in audio_files:
     converted = audio_file.relative_to(paths.audios_dir).with_suffix(".txt")
     if converted in list_of_transcribed:
-        print(f"Skiping {audio_file}")
         continue
     print("Doing " + str(audio_file))
     result = MODEL.transcribe(str(audio_file), language="spanish")
