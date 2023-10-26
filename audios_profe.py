@@ -92,9 +92,12 @@ else:
     temas = []
     LAST_LINE = 23
 
+if LAST_LINE == len(lines):
+    print(f"{Fore.YELLOW}No new lines to parse{Style.RESET_ALL}")
+    sys.exit()
 # Starting line is 23
 for index, line in enumerate(lines[LAST_LINE:]):
-    # Checks the regex for a message
+    # Checks the regex for a message. It will match messages and attachments
     match = re.match(PATTERN, line)
     if match:
         tema = {}
@@ -105,7 +108,7 @@ for index, line in enumerate(lines[LAST_LINE:]):
             tema["title"] = message.replace("/", "_")
             tema["files"] = []
             temas.append(tema)
-            print(f"{Fore.LIGHTYELLOW_EX}Appending {tema['title']}{Style.RESET_ALL}")
+            print(f"Appending {Fore.LIGHTYELLOW_EX}{tema['title']}{Style.RESET_ALL}")
 
         # Appends the files attached after a given message to a tema entry being the title the forementioned message
         if char and "omitted" not in message and "attached" in message:
