@@ -93,25 +93,37 @@ for video_file in video_files:
 
 # %%
 # Transcribe the audio file using Whisper
-audio_files = paths.audios_dir.glob("**/*.*")
-transcribed_files = paths.transcriptions_dir.glob("**/*.*")
+audio_files = {
+    paths.audios_dir: paths.audios_dir.glob("**/*.*"),
+    paths.PROFE_SORTED_DIR: paths.PROFE_SORTED_DIR.glob("**/*.wav"),
+}
 list_of_transcribed = [
-    file.relative_to(paths.transcriptions_dir) for file in transcribed_files
+    file.relative_to(paths.transcriptions_dir)
+    for file in paths.transcriptions_dir.glob("**/*.txt")
 ]
-for audio_file in audio_files:
-    converted = audio_file.relative_to(paths.audios_dir).with_suffix(".txt")
-    if converted in list_of_transcribed:
-        continue
-    print("Doing " + str(audio_file))
-    result = MODEL.transcribe(str(audio_file), language="spanish")
-    text = result["text"].strip()
-    text = text.replace(". ", ".\n")
+for base_audio_dir, audio_files in audio_files.items():
+    for audio_file in audio_files:
+        converted = audio_file.relative_to(base_audio_dir).with_suffix(".txt")
+        if converted in list_of_transcribed:
+            continue
+        print("Doing " + str(audio_file))
+        result = MODEL.transcribe(str(audio_file), language="spanish")
+        text = result["text"].strip()
+        text = text.replace(". ", ".\n")
 
-    text_file_path = paths.transcriptions_dir / converted
+        text_file_path = paths.transcriptions_dir / converted
 
-    # Ensure that the parent directory exists; create it if it doesn't
-    text_file_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(text_file_path, "w", encoding="utf-8") as f:
-        f.write(text)
+        # Ensure that the parent directory exists; create it if it doesn't
+        text_file_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(text_file_path, "w", encoding="utf-8") as f:
+            f.write(text)
+
 
 # %%
+"""
+✅  profe/sorted/Reglamento 
+✅  profe/sorted/PSX ley 3_2001
+✅  profe/sorted/Ley 41_2002
+✅  profe/sorted/Ley 3_2018 orgánica de protección de datos
+✅  profe/sorted/Tarjeta Sanitaria
+"""
