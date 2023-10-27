@@ -29,3 +29,10 @@ transcriptions_dir = pathlib.Path("./transcriptions/")
 ############ DIRECTORIO TRANSCRIPCIONES ############
 cwd = pathlib.Path(".")
 ############ DIRECTORIO TRANSCRIPCIONES ############
+
+
+ZIP_SOURCE_DIR = pathlib.Path("/home/sft/Nextcloud/")
+PROFE_DIR = pathlib.Path(".") / "profe"
+PROFE_SORTED_DIR = PROFE_DIR / "sorted"
+DUMP_DIR = PROFE_DIR / ".dump"
+CHAT_FILE = DUMP_DIR / "_chat.txt"

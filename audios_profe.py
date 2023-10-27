@@ -11,10 +11,10 @@ This module contains a script to process and organize audio files from a
 6. Converts opus/ogg audio files to mp3 format and removes the original opus/ogg files.
 
 Module Components:
-- ZIP_SOURCE_DIR: The source directory containing .zip files to be processed.
-- PROFE_DIR: The main processing directory.
-- PROFE_SORTED_DIR: Directory where the sorted files will be organized.
-- DUMP_DIR: Directory where the contents of the .zip files are extracted.
+- paths.ZIP_SOURCE_DIR: The source directory containing .zip files to be processed.
+- paths.PROFE_DIR: The main processing directory.
+- paths.PROFE_SORTED_DIR: Directory where the sorted files will be organized.
+- paths.DUMP_DIR: Directory where the contents of the .zip files are extracted.
 - CHAT_FILE: The chat data file to be processed.
 - PATTERN: Regular expression pattern to extract message details.
 - FILENAME_PATTERN: Regular expression pattern to extract attached filenames.
@@ -31,7 +31,6 @@ and convert opus/ogg files to mp3.
 Please ensure you have the necessary permissions and correct file paths before running this script.
 """
 
-from pathlib import Path
 import shutil
 import zipfile
 import os
@@ -40,32 +39,30 @@ import sys
 import pickle
 from utils.opus_to_mp3 import convert_opus_to_mp3
 from colorama import Fore, Style
+from consts import paths
 
+CHAT_FILE = paths.DUMP_DIR / "_chat.txt"
 
-ZIP_SOURCE_DIR = Path("/home/sft/Nextcloud/")
-PROFE_DIR = Path(".") / "profe"
-PROFE_SORTED_DIR = PROFE_DIR / "sorted"
-DUMP_DIR = PROFE_DIR / ".dump"
-CHAT_FILE = DUMP_DIR / "_chat.txt"
-
-# if os.path.exists(DUMP_DIR):
-#     delete_directory(DUMP_DIR)
+# if os.path.exists(paths.DUMP_DIR):
+#     delete_directory(paths.DUMP_DIR)
 
 # Iterate through all files in the source directory with the specified file extension
-if not list(ZIP_SOURCE_DIR.glob("*profe.zip")):
-    print(f"{Fore.RED}No files found in {ZIP_SOURCE_DIR}{Style.RESET_ALL}")
+if not list(paths.ZIP_SOURCE_DIR.glob("*profe.zip")):
+    print(f"{Fore.RED}No files found in {paths.ZIP_SOURCE_DIR}{Style.RESET_ALL}")
     sys.exit()
-for file_path in ZIP_SOURCE_DIR.glob("*profe.zip"):
-    print(f"Moving file '{file_path}' to '{PROFE_DIR / file_path.name}'...")
-    if not os.path.exists(PROFE_DIR):
-        os.makedirs(PROFE_DIR)
+for file_path in paths.ZIP_SOURCE_DIR.glob("*profe.zip"):
+    print(f"Moving file '{file_path}' to '{paths.PROFE_DIR / file_path.name}'...")
+    if not os.path.exists(paths.PROFE_DIR):
+        os.makedirs(paths.PROFE_DIR)
     # Use the shutil.move() function to move the file from source to destination
-    shutil.move(file_path, PROFE_DIR / file_path.name)
-    print(f"File '{file_path}' moved to '{PROFE_DIR / file_path.name}' successfully.")
+    shutil.move(file_path, paths.PROFE_DIR / file_path.name)
+    print(
+        f"File '{file_path}' moved to '{paths.PROFE_DIR / file_path.name}' successfully."
+    )
 
-for zip_file in PROFE_DIR.glob("*profe.zip"):
+for zip_file in paths.PROFE_DIR.glob("*profe.zip"):
     with zipfile.ZipFile(zip_file, "r") as zip_ref:
-        zip_ref.extractall(DUMP_DIR)
+        zip_ref.extractall(paths.DUMP_DIR)
 
 # Read the file into a list of lines
 if not CHAT_FILE.exists():
@@ -115,7 +112,7 @@ for index, line in enumerate(lines[LAST_LINE:]):
             rematch = re.match(FILENAME_PATTERN, message.strip())
             if rematch:
                 filename = rematch.groups()[0]
-                audio_path = DUMP_DIR / filename
+                audio_path = paths.DUMP_DIR / filename
                 temas[-1]["files"].append(audio_path)
 
 LAST_LINE = len(lines)
@@ -136,31 +133,31 @@ with open("pickle.pkl", "wb") as pkl_file:
 
 for tema in temas:
     # If the folder title does not exist and the file list is not empty create the target folder
-    if not os.path.exists(PROFE_SORTED_DIR / tema["title"]) and tema["files"]:
-        os.makedirs(PROFE_SORTED_DIR / tema["title"])
+    if not os.path.exists(paths.PROFE_SORTED_DIR / tema["title"]) and tema["files"]:
+        os.makedirs(paths.PROFE_SORTED_DIR / tema["title"])
 
     # For each of the files checks if the converted file exist
     # If the file does not exist is moved to the folder
     for file in tema["files"]:
-        sorted_file_path = PROFE_SORTED_DIR / tema["title"] / file.name
+        sorted_file_path = paths.PROFE_SORTED_DIR / tema["title"] / file.name
         if sorted_file_path.suffix in [".ogg", ".opus"]:
             sorted_file_path = (
-                PROFE_SORTED_DIR / tema["title"] / file.with_suffix(".wav").name
+                paths.PROFE_SORTED_DIR / tema["title"] / file.with_suffix(".wav").name
             )
         # If the converted file does not exist moves the original file
         if not sorted_file_path.exists():
             print(
-                f"{Fore.LIGHTYELLOW_EX}Adding {file} to {PROFE_SORTED_DIR / tema['title']} {Style.RESET_ALL}"
+                f"{Fore.LIGHTYELLOW_EX}Adding {file} to {paths.PROFE_SORTED_DIR / tema['title']} {Style.RESET_ALL}"
             )
-            shutil.move(file, PROFE_SORTED_DIR / tema["title"])
+            shutil.move(file, paths.PROFE_SORTED_DIR / tema["title"])
 
 
 OPUS_EXTENSION = "*.opus"
 OGG_EXTENSION = "*.ogg"
 # Creates a list of all opus and ogg files in the sorted dir. Meaning if they
 # are there they should be converted
-matching_files = list(PROFE_SORTED_DIR.rglob(OPUS_EXTENSION)) + list(
-    PROFE_SORTED_DIR.rglob(OGG_EXTENSION)
+matching_files = list(paths.PROFE_SORTED_DIR.rglob(OPUS_EXTENSION)) + list(
+    paths.PROFE_SORTED_DIR.rglob(OGG_EXTENSION)
 )
 
 # Converts and deletes the old file
